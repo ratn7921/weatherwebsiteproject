@@ -1,53 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/icon-syntax-1.svg" />
     <title>Weather App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="w1.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async defer>
+    </script>
+    <style>
+        .card-humidity {
+    background-image: url('https://image.shutterstock.com/image-vector/water-levelhygrometer-iconhumidity-weather-sensorisolated-260nw-2166723551.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.card-wind {
+    background-image: url('https://img.favpng.com/23/3/25/wind-speed-computer-icons-png-favpng-dFwTetEm4ZS7bR1Qi3qW4p16E.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+    </style>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">My Weather</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                </ul>
-                <!-- Hidden search form for future use -->
-                <!-- <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                 </form> -->
-            </div>
+            <a class="navbar-brand">Navbar</a>
+            <form class="d-flex" role="search" id="search-form">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search-input">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
         </div>
     </nav>
 
-    <div class="container">
-        <main>
-            <h2 class="text-center mt-4">Current Weather</h2>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 id="location-name"></h3>
-                    <p id="localtime"></p>
-                    <p id="temp"></p>
-                    <p id="condition"><img sizes="12%" id="condition-icon" src="/purepng.com-weather-iconsymbolsiconsapple-iosiosios-8-iconsios-8-721522596142qx4ep.png" alt="Weather icon"></p>
-                    <p id="humidity"></p>
-                    <p id="uv"></p>
-                    <p id="wind"></p>
+    <main>
+        <div class="container">
+            <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+                <div class="col">
+                    <div class="card h-100 mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">Weather</h4>
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-center">
+                            <h1 class="card-title pricing-card-title" id="free-temp"></h1>
+                            <ul class="list-unstyled mt-3 mb-4">
+                                <li id="free-description"></li>
+                                <li><img id="free-icon" src="" alt="Weather icon"></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">Humidity</h4>
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center">
+                            <h1 class="card-title pricing-card-title" id="pro-humidity"></h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3 text-white bg-primary">
+                            <h4 class="my-0 fw-normal">Wind Speed</h4>
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center">
+                            <h1 class="card-title pricing-card-title" id="enterprise-wind"></h1>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button id="next-btn" class="btn btn-primary">Next City</button>
-        </main>
-    </div>
+    
+            <h2 class="display-6 text-center mb-4">City Weather Details</h2>
+    
+            <div class="table-responsive">
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th>City</th>
+                            <th>Time</th>
+                            <th>Humidity</th>
+                            <th>Wind Speed</th>
+                            <th>Temperature</th>
+                        </tr>
+                    </thead>
+                    <tbody id="weather-table">
+                        <!-- Weather details will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    
 
-    <script src="script.js"></script>
+    <script>
+        const cities = [
+            { name: 'Mumbai', lat: '19.0760', lon: '72.8777' },
+            { name: 'Pune', lat: '18.5204', lon: '73.8567' },
+            { name: 'Kolkata', lat: '22.5726', lon: '88.3639' },
+            { name: 'Delhi', lat: '28.7041', lon: '77.1025' },
+            { name: 'London', lat: '51.5074', lon: '-0.1278' },
+            { name: 'Boston', lat: '42.3601', lon: '-71.0589' },
+            { name: 'Moscow', lat: '55.7558', lon: '37.6173' },
+            { name: 'Tokyo', lat: '35.6895', lon: '139.6917' },
+            { name: 'Los Angeles', lat: '34.0522', lon: '-118.2437' },
+            { name: 'Solapur', lat: '17.6599', lon: '75.9064' },
+            { name: 'Pandharpur', lat: '17.6792', lon: '75.3310' },
+            { name: 'Kolhapur', lat: '16.7040', lon: '74.2433' },
+            { name: 'Ichalkaranji', lat: '16.6919', lon: '74.4605' },
+
+            // Amravati District
+            { name: 'Amravati', lat: '20.9333', lon: '77.7500' },
+            { name: 'Achalpur', lat: '21.2578', lon: '77.5084' },
+
+            // Jalgaon District
+            { name: 'Jalgaon', lat: '21.0077', lon: '75.5626' },
+            { name: 'Bhusawal', lat: '21.0466', lon: '75.7818' },
+
+            // Akola District
+            { name: 'Akola', lat: '20.6976', lon: '77.0082' },
+            { name: 'Murtijapur', lat: '20.7305', lon: '77.3712' },
+
+            // Other notable cities
+            { name: 'Latur', lat: '18.4088', lon: '76.5604' },
+            { name: 'Nanded', lat: '19.1383', lon: '77.3210' },
+            { name: 'Dhule', lat: '20.9042', lon: '74.7749' },
+            { name: 'Ahmednagar', lat: '19.0952', lon: '74.7496' },
+            { name: 'Chandrapur', lat: '19.9615', lon: '79.2961' },
+            { name: 'Parbhani', lat: '19.2608', lon: '76.7766' },
+            { name: 'Jalna', lat: '19.8410', lon: '75.8864' }
+        ];
+
+        const weatherImages = {
+            'cloudy': 'cloudy.jpg',
+            'sunny': 'sunny.jpg',
+            'rainy': 'rainy.jpg',
+            'cold': 'cold.jpg'
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchForm = document.getElementById('search-form');
+            searchForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const searchInput = document.getElementById('search-input').value;
+                const city = cities.find(city => city.name.toLowerCase() === searchInput.toLowerCase());
+                if (city) {
+                    updateWeatherData(city.lat, city.lon);
+                } else {
+                    alert('City not found. Please enter a valid city name.');
+                }
+            });
+
+            // Initial call to update the weather data
+            updateWeatherDataByCityIndex();
+        });
+
+        async function updateWeatherData(lat, lon) {
+            const apiKey = 'd2c6c7582bffa5be14b625b995eb89c3';
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const weatherData = await response.json();
+
+                const locationName = `${weatherData.name}, ${weatherData.sys.country}`;
+                const localtime = new Date(weatherData.dt * 1000).toLocaleString();
+                const temp = `${weatherData.main.temp}°C (${(weatherData.main.temp * 9 / 5 + 32).toFixed(1)}°F)`;
+                const condition = weatherData.weather[0].description;
+                const conditionIcon = `http://openweathermap.org/img/wn/${weatherData.weather[0].icon}.png`;
+                const humidity = `${weatherData.main.humidity}%`;
+                const wind = `${weatherData.wind.speed} m/s ${weatherData.wind.deg}°`;
+
+                document.getElementById('free-temp').textContent = temp;
+                document.getElementById('free-description').textContent = condition;
+                document.getElementById('free-icon').src = conditionIcon;
+                document.getElementById('pro-humidity').textContent = humidity;
+                document.getElementById('enterprise-wind').textContent = wind;
+
+                // Update the table with the city weather details
+                const weatherTable = document.getElementById('weather-table');
+                const newRow = `
+                    <tr>
+                        <td>${locationName}</td>
+                        <td>${localtime}</td>
+                        <td>${humidity}</td>
+                        <td>${wind}</td>
+                        <td>${temp}</td>
+                    </tr>
+                `;
+                weatherTable.innerHTML = newRow;
+
+                // Update background image based on condition
+                if (condition.includes('cloud')) {
+                    document.body.style.backgroundImage = `url('${weatherImages.cloudy}')`;
+                } else if (condition.includes('sun')) {
+                    document.body.style.backgroundImage = `url('${weatherImages.sunny}')`;
+                } else if (condition.includes('rain')) {
+                    document.body.style.backgroundImage = `url('${weatherImages.rainy}')`;
+                } else if (condition.includes('cold')) {
+                    document.body.style.backgroundImage = `url('${weatherImages.cold}')`;
+                }
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+            }
+        }
+
+        async function updateWeatherDataByCityIndex() {
+            const city = cities[currentIndex];
+            updateWeatherData(city.lat, city.lon);
+        }
+    </script>
 </body>
+
 </html>
